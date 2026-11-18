@@ -35,20 +35,15 @@ The secret value must be a JSON object with these four fields:
 
 Keep this secret private. Never commit the keystore or its passwords.
 
-### Local build
-Set the same environment variables used by the workflow (`ANDROID_KEYSTORE_PATH`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`), then run:
+### Local debug build
+For a local debug APK (not the signed release used by GitHub Releases):
 
 ```bash
-npm ci
-npm run build
-npx cap sync android
-npm run android:icons
-node scripts/configure-android-signing.mjs
-cd android
-./gradlew assembleRelease
+npm install
+npm run android:build
 ```
 
-The signed APK is written to `android/app/build/outputs/apk/release/app-release.apk`.
+The debug APK is written to `android/app/build/outputs/apk/debug/app-debug.apk`. It is signed with the local Android debug key and is not suitable for updating the stable signed release installation.
 
 ## GitHub Actions
 Pushing app changes to `main` starts the Android release workflow. It:
