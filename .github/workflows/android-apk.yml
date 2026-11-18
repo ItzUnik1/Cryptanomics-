@@ -1,4 +1,5 @@
-name: Build Android APK
+name: Android APK
+
 on:
   workflow_dispatch:
   push:
@@ -9,52 +10,79 @@ on:
       - "package.json"
       - "package-lock.json"
       - "capacitor.config.json"
+      - "android/**"
       - ".github/workflows/android-apk.yml"
+
 permissions:
   contents: write
+
 concurrency:
   group: cryptanomics-android-release
   cancel-in-progress: true
+
 jobs:
   build:
+    name: Build and publish Android APK
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Check out repository
         uses: actions/checkout@v4
-      - name: Set up Node
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
       - name: Install dependencies
         run: npm install
-      - name: Build web app
+
+      - name: Read app version
+        id: version
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Build web application
         run: npm run build
-      - name: Add Android platform
-        run: npx cap add android
-      - name: Sync Capacitor
+
+      - name: Generate Android project if missing
+        run: |
+          if [ ! -d android ]; then
+            npx cap add android
+          fi
+
+      - name: Sync Capacitor Android project
         run: npx cap sync android
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "21"
+
       - name: Build debug APK
         working-directory: android
         run: chmod +x gradlew && ./gradlew assembleDebug
-      - name: Upload APK
+
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: CRYPTANOMICS-debug-apk
+          name: CRYPTANOMICS-v${{ steps.version.outputs.version }}-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-      - name: Publish GitHub release
+          retention-days: 30
+
+      - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.2.1
-          name: CRYPTANOMICS v0.2.1
+          tag_name: v${{ steps.version.outputs.version }}
+          name: CRYPTANOMICS v${{ steps.version.outputs.version }}
           body: |
-            CRYPTANOMICS Android update.
-            Download the APK asset and approve installation through Android.
+            ## CRYPTANOMICS v${{ steps.version.outputs.version }}
+
+            Android debug APK for this release.
+
+            Download the APK below and confirm installation through Android.
           files: android/app/build/outputs/apk/debug/app-debug.apk
           make_latest: true
         env:
