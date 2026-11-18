@@ -1,14 +1,15 @@
 {
   "name": "cryptanomics",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
     "android:add": "cap add android",
-    "android:sync": "cap sync android"
+    "android:sync": "cap sync android",
+    "android:build": "npm run build && cap sync android"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",
