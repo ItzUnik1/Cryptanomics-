@@ -25,3 +25,6 @@
 .update-actions button{white-space:nowrap}
 .update-actions button:disabled{opacity:.5}
 @media(max-width:700px){.update-panel{align-items:stretch;flex-direction:column}.update-actions{display:grid;grid-template-columns:1fr 1fr}.update-actions button{width:100%;padding:12px 8px;font-size:10px}}
+
+/* CRYPTANOMICS brand mark */
+.brand-logo{width:40px;height:40px;display:block;object-fit:contain;border-radius:11px;flex:0 0 auto;filter:drop-shadow(0 4px 12px rgba(0,180,255,.16))}.menu-top .brand-logo{width:48px;height:48px}.brand{gap:12px}
