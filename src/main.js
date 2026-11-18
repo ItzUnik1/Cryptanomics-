@@ -18,7 +18,7 @@ function render(){
  app.innerHTML=`
  <div class="shell">
   <aside class="sidebar"><div class="brand"><span class="brand-mark">C</span><div><b>CRYPTANOMICS</b><small>TRADING SIMULATOR</small></div></div>
-   <div class="desk-label">TRADING DESK</div><nav>${nav.map(([id,label])=>`<button class="nav ${page===id?"active":""}" data-page="${id}"><span>${({dashboard:"◫",markets:"⌁",portfolio:"▤",activity:"↗"})[id]}</span>${label}</button>`).join("")}</nav>
+   <div class="desk-label">TRADING DESK</div><nav>${nav.map(([id,label])=>`<button class="nav ${page===id?"active":""}" data-page="${id}"><span>${({dashboard:"◫",markets:"⌁",opportunities:"＄",portfolio:"▤",activity:"↗"})[id]}</span>${label}</button>`).join("")}</nav>
    <div class="sidebar-bottom"><div class="status-dot"></div><span>SIMULATION ONLINE</span><small>PHASE 01 · BUILD 0.1</small></div>
   </aside>
   <main class="main"><header class="topbar"><div><div class="eyebrow">TRADER TERMINAL / DAY ${state.day}</div><h1>${({dashboard:"Market overview",markets:"Markets",opportunities:"Earn your first capital",portfolio:"Your portfolio",activity:"Trade activity",settings:"Settings"})[page]}</h1></div><div class="top-actions"><span class="mood">${state.marketMood}</span><button class="icon-btn" id="menuBtn" title="Main menu">⌂</button><button class="icon-btn" id="settingsBtn" title="Settings">⚙</button><button class="icon-btn" id="saveBtn" title="Save game">↧</button></div></header>
