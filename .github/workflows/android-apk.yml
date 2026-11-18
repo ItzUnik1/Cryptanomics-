@@ -35,12 +35,20 @@ jobs:
         with:
           node-version: 22
 
+      - name: Create dependency lockfile when needed
+        run: |
+          if [ ! -f package-lock.json ]; then
+            npm install --package-lock-only
+          fi
+
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Read app version
         id: version
-        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+        run: |
+          VERSION=$(node -p "JSON.parse(require('fs').readFileSync('package.json')).version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Build web application
         run: npm run build
@@ -53,6 +61,16 @@ jobs:
 
       - name: Sync Capacitor Android project
         run: npx cap sync android
+
+      - name: Keep native Android build files in the repository
+        run: |
+          git add android package-lock.json
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "build(android): add native project and lockfile [skip ci]"
+            git push origin HEAD:main
+          fi
 
       - name: Set up Java
         uses: actions/setup-java@v4
