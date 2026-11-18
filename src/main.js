@@ -1,0 +1,81 @@
+import "./style.css";
+import {createInitialState,buy,sell,advanceDay,portfolioValue,totalEquity,formatMoney,formatNumber,FEE_RATE} from "./engine.js";
+import {saveGame,loadGame,deleteSave} from "./storage.js";
+let state=loadGame()||createInitialState();
+let page="dashboard",selected="BTCX",query="",sort="marketCap",tradeSide="BUY",quantity="1",toast="",toastTimer;
+const app=document.querySelector("#app");
+const money=n=>formatMoney(n);
+const pct=n=>`<span class="${n>=0?"up":"down"}">${n>=0?"+":""}${n.toFixed(2)}%</span>`;
+function notify(message){toast=message;render();clearTimeout(toastTimer);toastTimer=setTimeout(()=>{toast="";render()},2600)}
+function persist(){saveGame(state)}
+function asset(id){return state.assets.find(a=>a.id===id)}
+function valueOf(id){return (state.holdings[id]?.quantity||0)*asset(id).price}
+function render(){
+ const total=totalEquity(state),pValue=portfolioValue(state),invested=Object.values(state.holdings).reduce((n,h)=>n+h.quantity*h.average,0),unreal=pValue-invested;
+ const nav=[["dashboard","Overview"],["markets","Markets"],["portfolio","Portfolio"],["activity","Activity"]];
+ app.innerHTML=`
+ <div class="shell">
+  <aside class="sidebar"><div class="brand"><span class="brand-mark">C</span><div><b>CRYPTANOMICS</b><small>TRADING SIMULATOR</small></div></div>
+   <div class="desk-label">TRADING DESK</div><nav>${nav.map(([id,label])=>`<button class="nav ${page===id?"active":""}" data-page="${id}"><span>${({dashboard:"◫",markets:"⌁",portfolio:"▤",activity:"↗"})[id]}</span>${label}</button>`).join("")}</nav>
+   <div class="sidebar-bottom"><div class="status-dot"></div><span>SIMULATION ONLINE</span><small>PHASE 01 · BUILD 0.1</small></div>
+  </aside>
+  <main class="main"><header class="topbar"><div><div class="eyebrow">TRADER TERMINAL / DAY ${state.day}</div><h1>${({dashboard:"Market overview",markets:"Markets",portfolio:"Your portfolio",activity:"Trade activity"})[page]}</h1></div><div class="top-actions"><span class="mood">${state.marketMood}</span><button class="icon-btn" id="saveBtn" title="Save game">↧</button></div></header>
+   <section class="metrics">
+    <article class="metric primary"><label>TOTAL EQUITY</label><strong>${money(total)}</strong><small>Cash + current holdings</small></article>
+    <article class="metric"><label>AVAILABLE CASH</label><strong>${money(state.cash)}</strong><small>Ready to trade</small></article>
+    <article class="metric"><label>PORTFOLIO VALUE</label><strong>${money(pValue)}</strong><small>${Object.keys(state.holdings).length} assets held</small></article>
+    <article class="metric"><label>UNREALISED P/L</label><strong class="${unreal>=0?"up":"down"}">${unreal>=0?"+":""}${money(unreal)}</strong><small>Based on average buy price</small></article>
+   </section>
+   ${page==="dashboard"?dashboard():page==="markets"?markets():page==="portfolio"?portfolio():activity()}
+   <footer><span>SIMULATED MARKET DATA · NOT REAL CRYPTOCURRENCY</span><span>TRADING FEE ${(FEE_RATE*100).toFixed(2)}%</span></footer>
+  </main>
+  <aside class="rightbar"><div class="panel-head"><div><div class="eyebrow">QUICK TRADE</div><h2>Order ticket</h2></div><span class="live">● LIVE</span></div>
+   <div class="selected-asset"><div class="coin-icon">${selected.slice(0,1)}</div><div><b>${asset(selected).name}</b><small>${selected} / CR</small></div><strong>${money(asset(selected).price)}</strong></div>
+   <div class="toggle"><button data-side="BUY" class="${tradeSide==="BUY"?"chosen buy":""}">BUY</button><button data-side="SELL" class="${tradeSide==="SELL"?"chosen sell":""}">SELL</button></div>
+   <label class="field-label">QUANTITY</label><input id="quantity" type="number" min="0" step="any" value="${quantity}" />
+   <div class="estimate"><span>Estimated total</span><b>${money((Number(quantity)||0)*asset(selected).price*(tradeSide==="BUY"?1+FEE_RATE:1-FEE_RATE))}</b></div>
+   <button class="trade-btn ${tradeSide.toLowerCase()}" id="tradeBtn">${tradeSide} ${selected}</button>
+   <div class="trade-note">Includes ${(FEE_RATE*100).toFixed(2)}% trading fee. Prices are simulated.</div>
+   <div class="right-divider"></div><div class="panel-head"><div><div class="eyebrow">MARKET CLOCK</div><h2>Simulation</h2></div></div>
+   <div class="clock-row"><div><small>CURRENT DAY</small><b>DAY ${state.day}</b></div><span class="clock-state">${state.paused?"PAUSED":"RUNNING"}</span></div>
+   <button class="advance-btn" id="advanceBtn">Advance one day ↗</button>
+   <div class="clock-controls"><button id="pauseBtn">${state.paused?"Resume":"Pause"}</button><button id="resetBtn">Reset save</button></div>
+   <div class="disclaimer">This is a fictional educational simulation. No real funds or exchange orders.</div>
+  </aside>
+ </div>
+ ${toast?`<div class="toast">${toast}</div>`:""}
+ `;
+ bind();
+}
+function dashboard(){
+ const movers=[...state.assets].sort((a,b)=>Math.abs(b.change24)-Math.abs(a.change24)).slice(0,5);
+ return `<section class="content-grid"><div class="panel chart-panel"><div class="panel-head"><div><div class="eyebrow">MARKET PULSE</div><h2>Market performance</h2></div><span class="subtle">SIMULATED · 24H</span></div><div class="market-banner"><div><small>MARKET SENTIMENT</small><b>${state.marketMood}</b></div><p>${state.lastEvent}</p></div><div class="chart-wrap">${chartSvg(asset(selected).history)}</div><div class="chart-foot"><span>Selected: ${selected}</span><span>Current: ${money(asset(selected).price)}</span></div></div>
+ <div class="panel movers"><div class="panel-head"><div><div class="eyebrow">VOLATILITY WATCH</div><h2>Biggest movers</h2></div><button class="text-btn" data-page="markets">All markets →</button></div>${movers.map(a=>`<button class="mover" data-asset="${a.id}"><span class="coin-icon small">${a.id[0]}</span><span><b>${a.name}</b><small>${a.id}</small></span><strong>${money(a.price)}</strong>${pct(a.change24)}</button>`).join("")}</div></section>
+ <section class="panel news-panel"><div class="panel-head"><div><div class="eyebrow">THE WIRE</div><h2>Latest market news</h2></div><span class="subtle">SIMULATED HEADLINES</span></div>${state.news.slice(0,4).map(n=>`<div class="news-item"><span class="news-tag ${n.impact}">${n.tag}</span><div><b>${n.title}</b><p>${n.body}</p></div><small>DAY ${n.day}</small></div>`).join("")}</section>`;
+}
+function chartSvg(values){const w=680,h=190,p=12,min=Math.min(...values),max=Math.max(...values),range=max-min||1;const pts=values.map((v,i)=>`${p+i/(Math.max(values.length-1,1))*(w-p*2)},${h-p-(v-min)/range*(h-p*2)}`).join(" ");return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><defs><linearGradient id="area" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#57d6a0" stop-opacity=".22"/><stop offset="100%" stop-color="#57d6a0" stop-opacity="0"/></linearGradient></defs><path d="M ${pts.replaceAll(" "," L ")} L ${w-p},${h} L ${p},${h} Z" fill="url(#area)"/><polyline points="${pts}" fill="none" stroke="#57d6a0" stroke-width="2.5" vector-effect="non-scaling-stroke"/></svg>`}
+function markets(){
+ const list=state.assets.filter(a=>(a.name+" "+a.id+" "+a.sector).toLowerCase().includes(query.toLowerCase())).sort((a,b)=>sort==="price"?b.price-a.price:sort==="change"?b.change24-a.change24:a.name.localeCompare(b.name));
+ return `<section class="panel table-panel"><div class="panel-head"><div><div class="eyebrow">SPOT MARKET</div><h2>All assets <span class="count">${list.length}</span></h2></div><input class="search" id="search" placeholder="Search assets..." value="${query}"/></div><div class="table-scroll"><table><thead><tr><th>ASSET</th><th>PRICE (CR)</th><th>24H CHANGE</th><th>SUPPLY</th><th></th></tr></thead><tbody>${list.map(a=>`<tr><td><button class="asset-cell" data-asset="${a.id}"><span class="coin-icon small">${a.id[0]}</span><span><b>${a.name}</b><small>${a.id} · ${a.sector}</small></span></button></td><td>${money(a.price)}</td><td>${pct(a.change24)}</td><td>${a.supply}</td><td><button class="row-trade" data-pick="${a.id}">Trade</button></td></tr>`).join("")||'<tr><td colspan="5" class="empty">No assets match that search.</td></tr>'}</tbody></table></div></section>`;
+}
+function portfolio(){
+ const entries=Object.entries(state.holdings);
+ return `<section class="panel table-panel"><div class="panel-head"><div><div class="eyebrow">YOUR POSITIONS</div><h2>Holdings</h2></div><span class="subtle">${entries.length} OPEN POSITIONS</span></div>${entries.length?`<div class="table-scroll"><table><thead><tr><th>ASSET</th><th>QUANTITY</th><th>AVG. ENTRY</th><th>VALUE</th><th>P/L</th><th></th></tr></thead><tbody>${entries.map(([id,h])=>{const a=asset(id),v=valueOf(id),pl=v-h.quantity*h.average;return `<tr><td><b>${a.name}</b><small class="block">${id}</small></td><td>${formatNumber(h.quantity)}</td><td>${money(h.average)}</td><td>${money(v)}</td><td class="${pl>=0?"up":"down"}">${pl>=0?"+":""}${money(pl)}</td><td><button class="row-trade" data-pick="${id}" data-sell="true">Sell</button></td></tr>`}).join("")}</tbody></table></div>`:'<div class="empty-state"><div class="empty-icon">▤</div><h3>No positions yet</h3><p>Your portfolio is empty. Earn or obtain CR through gameplay before placing your first order.</p></div>'}</section>`;
+}
+function activity(){
+ return `<section class="panel table-panel"><div class="panel-head"><div><div class="eyebrow">ORDER HISTORY</div><h2>Transactions</h2></div><span class="subtle">${state.transactions.length} TOTAL</span></div>${state.transactions.length?`<div class="table-scroll"><table><thead><tr><th>DAY</th><th>TYPE</th><th>ASSET</th><th>QUANTITY</th><th>PRICE</th><th>FEE</th><th>TOTAL</th></tr></thead><tbody>${state.transactions.map(t=>`<tr><td>${t.day}</td><td><span class="type-pill ${t.type.toLowerCase()}">${t.type}</span></td><td>${t.asset}</td><td>${formatNumber(t.quantity)}</td><td>${money(t.price)}</td><td>${money(t.fee)}</td><td>${money(t.total)}</td></tr>`).join("")}</tbody></table></div>`:'<div class="empty-state"><div class="empty-icon">↗</div><h3>No trades recorded</h3><p>Your transaction history will appear here after your first trade.</p></div>'}</section>`;
+}
+function bind(){
+ document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>{page=b.dataset.page;render()}));
+ document.querySelectorAll("[data-asset]").forEach(b=>b.addEventListener("click",()=>{selected=b.dataset.asset;render()}));
+ document.querySelectorAll("[data-pick]").forEach(b=>b.addEventListener("click",()=>{selected=b.dataset.pick;if(b.dataset.sell)tradeSide="SELL";page="markets";render()}));
+ document.querySelectorAll("[data-side]").forEach(b=>b.addEventListener("click",()=>{tradeSide=b.dataset.side;render()}));
+ const q=document.querySelector("#quantity");q?.addEventListener("input",e=>{quantity=e.target.value;const total=document.querySelector(".estimate b");if(total)total.textContent=money((Number(quantity)||0)*asset(selected).price*(tradeSide==="BUY"?1+FEE_RATE:1-FEE_RATE))});
+ document.querySelector("#tradeBtn")?.addEventListener("click",()=>{try{state=tradeSide==="BUY"?buy(state,selected,quantity):sell(state,selected,quantity);persist();notify(`${tradeSide} order completed: ${quantity} ${selected}`)}catch(e){notify(e.message)}});
+ document.querySelector("#advanceBtn")?.addEventListener("click",()=>{state=advanceDay(state);persist();notify(`Day ${state.day} market update complete.`)});
+ document.querySelector("#pauseBtn")?.addEventListener("click",()=>{state.paused=!state.paused;persist();render()});
+ document.querySelector("#saveBtn")?.addEventListener("click",()=>{persist();notify("Game saved on this device.")});
+ document.querySelector("#resetBtn")?.addEventListener("click",()=>{if(confirm("Delete your local save and restart from Day 1 with 0 CR?")){deleteSave();state=createInitialState();page="dashboard";persist();render()}});
+ document.querySelector("#search")?.addEventListener("input",e=>{query=e.target.value;const pos=e.target.selectionStart;render();const input=document.querySelector("#search");input.focus();input.setSelectionRange(pos,pos)});
+}
+render();
