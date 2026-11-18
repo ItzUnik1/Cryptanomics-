@@ -14,3 +14,14 @@
 .settings-panel h2,.menu-settings h1{font-size:24px;margin:8px 0 24px}.setting-row{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.setting-row b{font-size:13px}.setting-row p{font-size:10px;color:var(--muted);margin:6px 0 0;line-height:1.5}.setting-row select{min-width:230px;background:#091017;border:1px solid #2a3745;color:#e9eef5;border-radius:6px;padding:11px;font:11px 'DM Mono'}.fx-note{font-size:10px;line-height:1.7;color:var(--muted);padding:15px 0}.settings-back{max-width:180px;margin-top:10px}.menu-settings{max-width:720px;margin:100px auto;width:100%;background:#101720;border:1px solid var(--line);border-radius:12px;padding:28px}
 @media(max-width:800px){.job-grid{grid-template-columns:1fr}.job-card{min-height:0}.menu-hero{padding:75px 0 55px}.menu-hero h1{letter-spacing:-2px}.menu-bottom{grid-template-columns:1fr;gap:18px}.menu-build{display:none}}
 @media(max-width:700px){.setting-row{align-items:flex-start;flex-direction:column}.setting-row select{width:100%;min-width:0}.menu-settings{margin:65px auto 0;padding:20px}.menu-screen{padding:20px}.menu-hero p{font-size:13px}.menu-actions{display:grid;grid-template-columns:1fr}.menu-actions button{width:100%}}
+
+.update-panel{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:17px 19px;margin:0 0 22px;background:linear-gradient(110deg,#111f1b,#101820);border:1px solid #294638;border-radius:9px}
+.update-copy{display:flex;flex-direction:column;gap:5px;min-width:0}
+.update-copy .eyebrow{color:var(--green)}
+.update-copy b{font-size:13px}
+.update-copy span{font-size:11px;color:#c1d0c8}
+.update-copy small{font-size:9px;color:var(--muted);line-height:1.5}
+.update-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.update-actions button{white-space:nowrap}
+.update-actions button:disabled{opacity:.5}
+@media(max-width:700px){.update-panel{align-items:stretch;flex-direction:column}.update-actions{display:grid;grid-template-columns:1fr 1fr}.update-actions button{width:100%;padding:12px 8px;font-size:10px}}
