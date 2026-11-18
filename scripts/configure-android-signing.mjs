@@ -25,7 +25,7 @@ let gradle = await readFile(gradlePath, "utf8");
 const packageJson = JSON.parse(await readFile("package.json", "utf8"));
 const [major, minor, patch] = packageJson.version.split(".").map(Number);
 const versionCode = major * 10000 + minor * 100 + patch;
-gradle = gradle.replace(/versionCode\\s+\\d+/, `versionCode ${versionCode}`);
+gradle = gradle.replace(/versionCode\s+\d+/, `versionCode ${versionCode}`);
 gradle = gradle.replace(/versionName\\s+"[^"]+"/, `versionName "${packageJson.version}"`);
 if (!gradle.includes("signingConfigs")) {
   const marker = "    buildTypes {";
