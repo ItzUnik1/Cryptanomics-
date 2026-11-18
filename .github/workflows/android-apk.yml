@@ -62,6 +62,14 @@ jobs:
       - name: Sync Capacitor Android project
         run: npx cap sync android
 
+      - name: Generate CRYPTANOMICS Android launcher icons
+        run: npm run android:icons
+
+      - name: Configure persistent release signing
+        env:
+          ANDROID_SIGNING_CONFIG: ${{ secrets.ANDROID_SIGNING_CONFIG }}
+        run: node scripts/configure-android-signing.mjs
+
       - name: Keep native Android build files in the repository
         run: |
           git add android package-lock.json
@@ -80,13 +88,13 @@ jobs:
 
       - name: Build debug APK
         working-directory: android
-        run: chmod +x gradlew && ./gradlew assembleDebug
+        run: chmod +x gradlew && ./gradlew assembleRelease
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: CRYPTANOMICS-v${{ steps.version.outputs.version }}-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 30
 
@@ -98,7 +106,7 @@ jobs:
           body: |
             ## CRYPTANOMICS v${{ steps.version.outputs.version }}
 
-            Android debug APK for this release.
+            Signed Android release APK for this release.
 
             Download the APK below and confirm installation through Android.
           files: android/app/build/outputs/apk/debug/app-debug.apk
