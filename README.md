@@ -15,6 +15,8 @@ CRYPTANOMICS is a mobile-first, real-inspired **cryptocurrency trading simulatio
 
 > **Simulation only.** CRYPTANOMICS does not connect to cryptocurrency exchanges, process real transactions or use real money. All assets, prices and market events are fictional.
 
+![CRYPTANOMICS logo](public/cryptanomics-logo.svg)
+
 ## Download
 
 Get the latest Android APK from the [GitHub Releases page](https://github.com/ItzUnik1/Cryptanomics-/releases/latest).
@@ -34,6 +36,7 @@ The app checks GitHub Releases for newer versions from its main menu. Android st
 - **Currency display:** switch between USD and NPR. NPR uses a fixed in-game display conversion of रू 140 per USD, not a live exchange rate.
 - **Local saves:** career data is stored on the device.
 - **Update checker:** check for newer published APK releases from the main menu.
+- **App identity:** custom CRYPTANOMICS launcher icon and consistent release signing.
 
 ## Tech stack
 
@@ -66,7 +69,7 @@ The generated web app is written to `dist/`.
 
 ## Build the Android APK
 
-The Capacitor Android project is kept in this repository so the native build configuration and Gradle wrapper are version-controlled.
+The Capacitor Android project is kept in this repository so the native build configuration and Gradle wrapper are version-controlled. Release APKs use a persistent signing key stored in the private GitHub Actions secret `ANDROID_SIGNING_CONFIG`.
 
 Requirements: Node.js 22+, npm and JDK 21.
 
@@ -97,7 +100,7 @@ npx cap add android
 npx cap sync android
 ```
 
-See [BUILDING.md](BUILDING.md) for the full build and release process.
+See [BUILDING.md](BUILDING.md) for the full build and release process, including the one-time signing secret setup.
 
 ## Repository layout
 
