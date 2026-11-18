@@ -1,6 +1,6 @@
 import "./style.css";
 import { Browser } from "@capacitor/browser";
-const APP_VERSION = "0.2.1";
+const APP_VERSION = "0.2.2";
 const RELEASES_API = "https://api.github.com/repos/ItzUnik1/Cryptanomics-/releases/latest";
 import {createInitialState,buy,sell,advanceDay,claimJob,JOBS,portfolioValue,totalEquity,formatMoney,formatNumber,FEE_RATE,NPR_PER_USD} from "./engine.js";
 import {saveGame,loadGame,deleteSave} from "./storage.js";
