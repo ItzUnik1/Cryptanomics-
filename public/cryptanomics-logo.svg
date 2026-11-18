@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="CRYPTANOMICS logo">
+  <defs>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eff8ff"/>
+      <stop offset=".42" stop-color="#00d8f5"/>
+      <stop offset="1" stop-color="#1264e8"/>
+    </linearGradient>
+    <linearGradient id="bars" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#00e5ff"/>
+      <stop offset="1" stop-color="#1264e8"/>
+    </linearGradient>
+    <linearGradient id="arrow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#79cfff"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#070d1c"/>
+  <path d="M370 104 256 40 83 140v232l173 100 173-100" fill="none" stroke="url(#edge)" stroke-width="34" stroke-linejoin="bevel" stroke-linecap="square"/>
+  <g fill="url(#bars)">
+    <path d="M153 220h44v145h-44z"/><path d="M175 184v36m0 145v28" stroke="#00dff8" stroke-width="10"/>
+    <path d="M235 175h45v190h-45z"/><path d="M257 139v36m0 190v28" stroke="#00dff8" stroke-width="10"/>
+    <path d="M317 231h44v134h-44z"/><path d="M339 195v36m0 134v28" stroke="#00dff8" stroke-width="10"/>
+  </g>
+  <path d="m118 376 110-96 64 34 110-116" fill="none" stroke="#07152c" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="m118 376 110-96 64 34 110-116" fill="none" stroke="url(#arrow)" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="m367 198 47-20-12 50" fill="none" stroke="url(#arrow)" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
