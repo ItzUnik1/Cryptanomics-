@@ -1,66 +1,62 @@
 # Building CRYPTANOMICS
 
-This guide covers local web builds, Android builds and the automated release workflow.
-
 ## Requirements
-
-- Node.js 22 or newer
+- Node.js 22+
 - npm
 - JDK 21
-- Android SDK / Android Studio for local device or emulator deployment
+- Android SDK for local Android Studio builds
 
-## Install dependencies
-
+## Web
 ```bash
-npm install
-```
-
-## Web build
-
-```bash
+npm ci
+npm run dev
 npm run build
 ```
 
-Vite writes the production bundle to `dist/`.
+## Android release APK
+The Android project is generated/synchronised by Capacitor. Launcher icon assets are generated from `public/cryptanomics-logo.svg`.
 
-## Android build
+A stable release signing key is required. The private keystore is intentionally not committed to this public repository.
 
-The `android/` directory is the Capacitor native project. Keep its Gradle wrapper and project configuration in version control. Do not commit generated Gradle caches, local SDK paths, or build output.
+### One-time GitHub signing secret
+The repository owner must add an Actions secret named `ANDROID_SIGNING_CONFIG` under:
+Settings → Secrets and variables → Actions → New repository secret.
+
+The secret value must be a JSON object with these four fields:
+
+```json
+{
+  "keystoreBase64": "BASE64_ENCODED_PKCS12_KEYSTORE",
+  "storePassword": "KEYSTORE_PASSWORD",
+  "keyAlias": "cryptanomics",
+  "keyPassword": "KEY_PASSWORD"
+}
+```
+
+Keep this secret private. Never commit the keystore or its passwords.
+
+### Local build
+Set the same environment variables used by the workflow (`ANDROID_KEYSTORE_PATH`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`), then run:
 
 ```bash
+npm ci
+npm run build
 npx cap sync android
+npm run android:icons
+node scripts/configure-android-signing.mjs
 cd android
-./gradlew assembleDebug
+./gradlew assembleRelease
 ```
 
-APK output:
-
-```
-android/app/build/outputs/apk/debug/app-debug.apk
-```
-
-On Windows, run `gradlew.bat assembleDebug` from the `android` directory.
+The signed APK is written to `android/app/build/outputs/apk/release/app-release.apk`.
 
 ## GitHub Actions
+Pushing app changes to `main` starts the Android release workflow. It:
+1. Builds the Vite web app.
+2. Generates/synchronises the Capacitor Android project.
+3. Creates Android launcher icons from the repository SVG.
+4. Configures the stable signing key from `ANDROID_SIGNING_CONFIG`.
+5. Builds a signed release APK.
+6. Uploads the APK artifact and publishes a versioned GitHub Release.
 
-The workflow at `.github/workflows/android-apk.yml`:
-
-1. Checks out the repository.
-2. Installs Node dependencies.
-3. Builds the Vite web application.
-4. Synchronises the Capacitor Android project.
-5. Builds the Android debug APK with Gradle.
-6. Uploads the APK as a workflow artifact.
-7. Publishes the APK to GitHub Releases using the version in `package.json`.
-
-It can run automatically after relevant pushes to `main` or manually through the Actions tab.
-
-## Preparing a release
-
-1. Update `version` in `package.json`.
-2. Update `APP_VERSION` in `src/main.js` to the same version.
-3. Commit and push to `main`.
-4. Wait for the Android workflow to complete successfully.
-5. Verify the APK in the workflow artifacts and GitHub Releases.
-
-The workflow uses the package version to create the release tag, for example `0.2.2` becomes `v0.2.2`. Do not reuse an existing release version.
+The first installation using the new stable key may require uninstalling an older APK that was signed with the previous temporary CI debug key. Android cannot update an app across different signing certificates. Uninstalling erases local career saves, so preserve any important progress first.
