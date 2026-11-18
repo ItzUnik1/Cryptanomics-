@@ -28,3 +28,73 @@
 
 /* CRYPTANOMICS brand mark */
 .brand-logo{width:40px;height:40px;display:block;object-fit:contain;border-radius:11px;flex:0 0 auto;filter:drop-shadow(0 4px 12px rgba(0,180,255,.16))}.menu-top .brand-logo{width:48px;height:48px}.brand{gap:12px}
+
+
+/* Govern-inspired interface refresh + Android safe-area handling */
+:root{
+  --bg:#0b1220;--panel:#131c2e;--panel2:#1a2640;--line:#2a3857;
+  --text:#eef2fa;--muted:#98a6c2;--accent:#6b9cff;--green:#3fd196;--red:#ff7b7b;
+  color:var(--text);background:var(--bg);
+}
+html{min-height:100%;background:var(--bg)}
+body{min-height:100vh;background:radial-gradient(ellipse at 50% -25%,#1b2a46 0,transparent 55%),var(--bg);color:var(--text)}
+button,input,select{font:inherit}
+.shell{max-width:1440px;min-height:100dvh;background:transparent}
+.sidebar{background:rgba(11,18,32,.88);border-color:var(--line)}
+.main{padding:28px clamp(18px,3vw,38px) 28px}
+.brand b{letter-spacing:1.3px}
+.brand small,.sidebar-bottom small{color:var(--muted)}
+.nav{border-radius:10px;color:var(--muted);transition:background .18s,color .18s}
+.nav.active,.nav:hover{background:#1a2944;color:var(--accent)}
+.metric,.panel,.job-card,.menu-settings{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 24px #05091422}
+.metric.primary{background:linear-gradient(145deg,#142b2b,#131c2e);border-color:#285b53}
+.metric label,.field-label,.eyebrow,.desk-label{color:var(--muted)}
+.metric strong{font-size:clamp(18px,1.8vw,25px);letter-spacing:-.5px}
+.market-banner{background:#0d1728;border-radius:10px;padding:14px}
+.chart-wrap{border-radius:10px;background-color:#101a2b}
+.rightbar{background:#0e1728;border-color:var(--line)}
+.icon-btn,.advance-btn,.clock-controls button,.menu-secondary{background:#1a2640;border-color:var(--line);color:var(--text);border-radius:9px}
+.mood,.clock-state{color:var(--green);border-color:#285b53;border-radius:8px}
+.trade-btn,.menu-primary,.claim-btn{border-radius:9px;background:var(--accent);border-color:var(--accent);color:#071326}
+.trade-btn.sell{background:var(--red);color:#21090d}
+input,.setting-row select{background:#0d1728;border:1px solid var(--line);border-radius:9px;color:var(--text)}
+.table-panel,.panel{overflow:hidden}
+th{color:var(--muted)}
+td{color:#d6deed}
+.mover,.news-item{border-color:var(--line)}
+.coin-icon{background:#1a2944;color:var(--accent);border-radius:10px}
+.type-pill.buy{color:var(--green);background:#17372f}
+.type-pill.sell{color:var(--red);background:#38232d}
+.toast{border-radius:12px}
+.menu-screen{min-height:100dvh;background:radial-gradient(ellipse at 78% 28%,#20385c66 0,transparent 38%),radial-gradient(ellipse at 20% 80%,#173c3766 0,transparent 40%),var(--bg)}
+.menu-settings{background:var(--panel)}
+.update-panel{background:var(--panel);border-color:var(--line);border-radius:14px}
+.capital-note{background:#142b2b;border-color:#285b53;border-radius:10px}
+.job-card{background:var(--panel)}
+@media(max-width:700px){
+  /* Keep Android's clock/status icons outside the app content. */
+  #app{min-height:100dvh;padding-top:env(safe-area-inset-top,0px)}
+  .shell{display:flex;flex-direction:column;min-height:calc(100dvh - env(safe-area-inset-top,0px));padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+  .sidebar{display:contents}
+  .sidebar .brand{position:relative;order:0;display:flex;margin:0;padding:12px 18px 10px;background:rgba(11,18,32,.96);border-bottom:1px solid var(--line);z-index:2}
+  .sidebar .brand-logo{width:38px;height:38px}
+  .sidebar nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));background:rgba(19,28,46,.97);border-top:1px solid var(--line);backdrop-filter:blur(16px);overflow:visible}
+  .sidebar .nav{display:flex;flex-direction:column;justify-content:center;gap:3px;min-width:0;padding:7px 2px;border-radius:9px;text-align:center;font-size:9px;white-space:nowrap}
+  .sidebar .nav span{font-size:17px;line-height:1.2}
+  .desk-label,.sidebar-bottom{display:none}
+  .main{padding:18px 16px 22px}
+  .topbar{margin-bottom:20px}
+  .topbar h1{font-size:23px}
+  .metrics{gap:10px}
+  .metric{padding:14px}
+  .metric strong{font-size:20px}
+  .panel{padding:16px}
+  .rightbar{padding:18px 16px 24px;border-radius:14px;margin:0 16px 18px;border:1px solid var(--line)}
+  .chart-wrap{height:190px}
+  .menu-screen{min-height:100dvh;padding:calc(20px + env(safe-area-inset-top,0px)) 20px calc(20px + env(safe-area-inset-bottom,0px))}
+  .menu-settings{margin:35px auto 0}
+}
+@media(min-width:701px) and (max-width:1100px){
+  .main{padding:24px}
+  .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
