@@ -1,7 +1,7 @@
 {
   "name": "cryptanomics",
   "private": true,
-  "version": "0.2.2",
+  "version": "0.2.3",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
@@ -9,7 +9,8 @@
     "preview": "vite preview --host 0.0.0.0",
     "android:add": "cap add android",
     "android:sync": "cap sync android",
-    "android:build": "npm run build && cap sync android && cd android && ./gradlew assembleDebug"
+    "android:icons": "node scripts/generate-android-icons.mjs",
+    "android:build": "npm run build && cap sync android && npm run android:icons && node scripts/configure-android-signing.mjs && cd android && ./gradlew assembleRelease"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",
@@ -18,6 +19,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^7.4.3",
+    "sharp": "^0.34.3",
     "vite": "^6.4.1"
   }
 }
