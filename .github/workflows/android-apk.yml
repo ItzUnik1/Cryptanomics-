@@ -93,7 +93,7 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: CRYPTANOMICS-v${{ steps.version.outputs.version }}-debug-apk
+          name: CRYPTANOMICS-v${{ steps.version.outputs.version }}-signed-apk
           path: android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 30
@@ -109,7 +109,7 @@ jobs:
             Signed Android release APK for this release.
 
             Download the APK below and confirm installation through Android.
-          files: android/app/build/outputs/apk/debug/app-debug.apk
+          files: android/app/build/outputs/apk/release/app-release.apk
           make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
